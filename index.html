@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>충청남도의회 AI의정브레인 의정운영도우미</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;800&display=swap"
+    rel="stylesheet">
+  <!-- CSS 연결 -->
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-top">
+        <div class="sidebar-top-title">AI 지방의회 운영 가이드 시스템</div>
+        <button class="sidebar-close" id="sidebarClose" aria-label="닫기">✕</button>
+      </div>
+
+      <div class="sidebar-inner">
+        <div class="sidebar-card sidebar-brand">
+          <div class="brand-row">
+            <img src="의회슬로건.png" class="sidebar-logo" alt="충청남도의회 로고">
+          </div>
+        </div>
+
+        <div class="sidebar-card">
+          <div class="sidebar-status">
+            <span class="status-dot" id="status-dot"></span>
+            <strong id="status-text">확인 중</strong>
+          </div>
+        </div>
+
+        <div class="sidebar-card">
+          <div class="sidebar-title">화면 테마</div>
+          <div class="theme-options">
+            <button class="theme-btn active" data-theme="default" aria-label="기본 테마"></button>
+            <button class="theme-btn blue" data-theme="blue" aria-label="블루 테마"></button>
+            <button class="theme-btn red" data-theme="red" aria-label="레드 테마"></button>
+            <button class="theme-btn green" data-theme="green" aria-label="그린 테마"></button>
+            <button class="theme-btn dark" data-theme="dark" aria-label="다크 테마"></button>
+          </div>
+        </div>
+
+        <div class="sidebar-card">
+          <div class="sidebar-title">대화 관리</div>
+          <button class="sidebar-reset-btn" onclick="clearChat()">대화 초기화</button>
+        </div>
+      </div>
+    </aside>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="main-panel">
+      <div class="logo-header">
+        <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+        <img src="의회 슬로건2.png" class="main-logo" alt="충청남도의회 로고">
+      </div>
+
+      <div class="notice">
+        <div class="notice-badge">📢</div>
+        <div>
+          <strong>[필독] 의정정보 관련 공지사항</strong>
+          <span>궁금한 내용을 메뉴에서 선택하거나 직접 질문해 보세요.</span>
+        </div>
+      </div>
+
+      <div class="scroll-area" id="scroll-area">
+        <div class="pill-banner" id="top-pill-banner">
+          # 사용자들이 자주하는 질문을 확인해 보세요!
+        </div>
+
+        <div id="messages">
+          <div class="welcome-block" id="welcome">
+            <div class="timestamp" id="welcome-time"></div>
+            <div class="guide-row">
+              <img src="백룡이.png" class="guide-avatar" alt="백룡이">
+              <div class="guide-bubble">궁금한 내용을 직접 질문해보세요!</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="composer">
+        <button class="zoom-btn" type="button" onclick="zoomText()">가+</button>
+
+        <div class="input-col">
+          <textarea id="user-input" rows="1" placeholder="질문을 입력해 주세요"></textarea>
+          <div class="input-sub">Enter 전송 · Shift+Enter 줄바꿈</div>
+        </div>
+
+        <button id="send-btn" type="button" onclick="sendMessage()">✈</button>
+      </div>
+    </div>
+  </div>
+   <!-- JS 연결 (맨 아래!) -->
+  <script src="script.js"></script>
+</body>
+</html>
