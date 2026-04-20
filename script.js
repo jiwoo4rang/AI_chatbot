@@ -22,6 +22,25 @@
     const toggleBtn = document.getElementById("sidebarToggle");
     const closeBtn = document.getElementById("sidebarClose");
     const overlay = document.getElementById("sidebarOverlay");
+    
+    // 채팅에 삽입되는 이미지 가운데 정렬 스타일 추가
+    (function centerChatImages(){
+      const css = `
+        #messages img, .message .bubble img, .sources img, .guide-bubble img { display:block; margin:8px auto; max-width:100%; height:auto; }
+      `;
+      const s = document.createElement('style');
+      s.type = 'text/css';
+      s.appendChild(document.createTextNode(css));
+      (document.head || document.getElementsByTagName('head')[0]).appendChild(s);
+    })();
+    // 고정 창 폭 설정: 기본값은 '475px'. 필요시 변경하세요.
+    function fixWindowWidth(width = '475px') {
+      const container = document.querySelector('.app') || document.getElementById('app') || document.body;
+      container.style.boxSizing = 'border-box';
+      container.style.width = width;
+      container.style.maxWidth = width;
+      container.style.margin = '0 auto';
+    }
    
     /* 사이드바 
     function openSidebar() {
@@ -49,6 +68,8 @@
     toggleBtn.addEventListener("click", openSidebar);
     closeBtn.addEventListener("click", closeSidebar);
     overlay.addEventListener("click", closeSidebar);
+    // 창 폭 고정 적용 (원하면 주석 처리 가능)
+    fixWindowWidth('475px');
     
     function applyTheme(theme) {
       document.body.setAttribute('data-theme', theme);
@@ -217,7 +238,16 @@
     function addSources(sources) {
       const d = document.createElement('div');
       d.className = 'sources';
-      d.innerHTML = '📎 출처: ' + sources.map(s => `<span>${String(s)}</span>`).join(', ');
+      d.style.textAlign = 'center';
+      d.style.display = 'inline-block';
+      d.style.margin = '8px auto';
+      d.style.width = 'auto';
+      d.style.maxWidth = '100%';
+      d.innerHTML = [
+        '위 답변은 지방의회 운영 가이드북을 바탕으로 작성되었습니다.',
+        '⚠️ 중요한 의사결정시 반드시 사실관계를 확인하세요',
+        '<strong>문의: 해당부서 041)635-0000</strong>'
+      ].map(line => `<div>${line}</div>`).join('');
       messagesEl.appendChild(d);
       scrollToBottom();
       applyZoom();

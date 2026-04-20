@@ -762,25 +762,37 @@
   margin-top: 12px;
 }
 
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+  z-index: 2000;
+}
+
+.sidebar-overlay.show {
+  opacity: 1;
+  visibility: visible;
+}
+
 
    /* 모바일에서 사이드바 숨기기 */
 @media (max-width: 900px) {
-
   .app {
     flex-direction: column;
   }
 
-  /* 사이드바 완전히 숨김 */
+  /* 기존 display:none 제거 */
   .sidebar {
-    display: none;
+    display: flex;
   }
 
-  /* 메인 패널 전체 사용 */
   .main-panel {
     width: 100%;
     border-radius: 18px;
   }
-
 }
 
     /* 작은 모바일 화면 */
