@@ -1,0 +1,22 @@
+{
+  "name": "충청남도의회AI의정브레인 챗봇",
+  "short_name": "AI의정브레인",
+  "description": "충청남도의회 AI 의정브레인 챗봇",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#c8dff2",
+  "theme_color": "#c8dff2",
+  "icons": [
+    {
+      "src": "favicon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "favicon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

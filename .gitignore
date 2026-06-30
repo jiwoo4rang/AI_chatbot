@@ -1,1 +1,11 @@
+<<<<<<< HEAD
 assembly_ai.db
+=======
+__pycache__/
+*.pyc
+.env
+.venv/
+assembly_ai.db
+uploads/
+chroma_db/
+>>>>>>> 969e877 (Update retro chatbot UI)

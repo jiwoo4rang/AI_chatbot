@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="finance">
+  <rect x="13" y="10" width="38" height="44" rx="7" fill="#e8f4ff" stroke="#0f5fa8" stroke-width="3"/>
+  <path d="M22 23h20M22 33h20M22 43h10" fill="none" stroke="#0f5fa8" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="44" cy="44" r="9" fill="#f2b94b" stroke="#94680f" stroke-width="2"/>
+  <path d="M44 38v12M39 44h10" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+</svg>

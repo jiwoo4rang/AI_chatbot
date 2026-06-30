@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="education">
+  <path d="M10 25l22-11 22 11-22 11-22-11z" fill="#e8f4ff" stroke="#0f5fa8" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M20 32v11c7 6 17 6 24 0V32" fill="#f6fbff" stroke="#0f5fa8" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M51 28v14" stroke="#f2b94b" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="51" cy="46" r="4" fill="#f2b94b"/>
+</svg>
