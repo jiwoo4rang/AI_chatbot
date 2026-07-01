@@ -74,11 +74,6 @@ pip install chromadb FlagEmbedding
 
 최초 실행 시 관리자 계정이 자동 생성됩니다.
 
-```text
-아이디: admin
-비밀번호: admin1234
-```
-
 운영 환경에서는 반드시 환경 변수로 변경해서 실행하세요.
 
 ```bash
