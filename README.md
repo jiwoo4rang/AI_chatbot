@@ -41,7 +41,7 @@ chatbot/
 
 ```bash
 cd /home/ahye/services/chatbot
-python3 rag_server.py
+LLM_API_KEY=your_api_key SECRET_KEY=change_this_secret python3 rag_server.py
 ```
 
 기본 접속 주소:
@@ -53,7 +53,7 @@ http://localhost:3000
 포트를 바꿔 실행하려면:
 
 ```bash
-PORT=8080 python3 rag_server.py
+PORT=8080 LLM_API_KEY=your_api_key SECRET_KEY=change_this_secret python3 rag_server.py
 ```
 
 ## 📦 필요 패키지
@@ -70,14 +70,17 @@ pip install flask flask-cors requests pypdf
 pip install chromadb FlagEmbedding
 ```
 
-## 🔑 기본 계정
 
-최초 실행 시 관리자 계정이 자동 생성됩니다.
+## 🔑 관리자 계정
 
+<<<<<<< HEAD
 운영 환경에서는 반드시 환경 변수로 변경해서 실행하세요.
+=======
+최초 실행 시 관리자 계정이 자동 생성됩니다. 운영 환경에서는 기본값을 쓰지 말고 환경 변수로 변경하세요.
+>>>>>>> ce04b3d (Remove hardcoded secrets from config)
 
 ```bash
-ADMIN_USERNAME=admin_user ADMIN_PASSWORD=strong_password python3 rag_server.py
+ADMIN_USERNAME=admin_user ADMIN_PASSWORD=strong_password LLM_API_KEY=your_api_key python3 rag_server.py
 ```
 
 ## ⚙️ 환경 변수
@@ -142,3 +145,9 @@ GET  /api/files/<file_id>    업로드 파일 열기
 - `assembly_ai.db`에는 사용자, 대화 기록, 업로드 파일 메타데이터가 저장됩니다.
 - `chroma_db/`는 문서 인덱싱 결과이므로 재생성이 가능합니다.
 - `static/` 폴더 안에도 과거 실행용 서버 파일이 일부 남아 있을 수 있지만, 현재 루트 기준 실행은 `rag_server.py`를 사용합니다.
+
+## 🔒 보안 주의
+
+- API 키, 세션 키, 관리자 비밀번호는 코드에 직접 적지 말고 환경 변수로만 설정합니다.
+- `.env`, `.venv/`, `assembly_ai.db`, `uploads/`, `chroma_db/`, `.claude/`는 GitHub에 올리지 않습니다.
+- 실수로 API 키를 커밋했다면 파일에서 지우는 것만으로는 부족하므로 해당 키를 즉시 폐기하고 새 키를 발급하세요.

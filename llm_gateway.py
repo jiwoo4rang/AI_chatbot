@@ -4,7 +4,7 @@ import os
 import requests
 
 LLM_BASE_URL = os.getenv("LLM_BASE_URL", "http://121.189.21.229/api").rstrip("/")
-LLM_API_KEY = os.getenv("LLM_API_KEY", "sk-efbff457535c4812894a1c188479d4f0")
+LLM_API_KEY = os.getenv("LLM_API_KEY")
 LLM_MODEL = os.getenv("LLM_MODEL", "ai-")
 LLM_MAX_TOKENS = int(os.getenv("LLM_MAX_TOKENS", "4000"))
 LLM_CHAT_URL = f"{LLM_BASE_URL}/chat/completions"
@@ -12,6 +12,8 @@ LLM_MODELS_URL = f"{LLM_BASE_URL}/models"
 
 
 def auth_headers(include_content_type=False):
+    if not LLM_API_KEY:
+        raise RuntimeError("LLM_API_KEY 환경 변수가 설정되어 있지 않습니다.")
     headers = {"Authorization": f"Bearer {LLM_API_KEY}"}
     if include_content_type:
         headers["Content-Type"] = "application/json"
