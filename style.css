@@ -502,37 +502,6 @@ button {
   min-width: 0;
 }
 
-.history-toggle {
-  position: absolute;
-  top: 12px;
-  left: 14px;
-  z-index: 3;
-  width: 38px;
-  height: 24px;
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 3px;
-  border: 1px solid #dde0e5;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.82);
-  flex-shrink: 0;
-}
-
-.history-toggle span {
-  width: 16px;
-  height: 2px;
-  border-radius: 999px;
-  background: var(--navy-deep);
-}
-
-.history-toggle:hover,
-.history-toggle[aria-expanded="true"] {
-  background: #fff;
-  border-color: var(--navy-soft);
-}
-
 .header-brand {
   display: flex;
   align-items: center;
@@ -566,20 +535,6 @@ button {
 
 .header-brand h1 .brand-accent {
   color: #1976d2;
-}
-
-.header-brand h1 .talk-badge {
-  position: absolute;
-  top: -8px;
-  left: -8px;
-  font-size: 0.7em;
-  font-style: normal;
-  font-weight: 900;
-  color: #D44000;
-  line-height: 1;
-  pointer-events: none;
-  transform: rotate(-20deg);
-  transform-origin: left top;
 }
 
 .header-brand h1 .brand-italic {
@@ -732,56 +687,6 @@ button {
   color: #9a2f2f;
 }
 
-.notice-stack {
-  padding: 0;
-  border-bottom: 1px solid #d8dce2;
-  background: #f0f2f5;
-  flex-shrink: 0;
-}
-
-.notice-line {
-  min-height: 28px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #2c3340;
-  font-size: 12px;
-  padding: 0 14px;
-  overflow: hidden;
-}
-
-.notice-line > span:last-child {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.notice-line + .notice-line {
-  min-height: 25px;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
-  font-size: 12px;
-}
-
-.notice-tag {
-  min-width: 32px;
-  display: inline-flex;
-  justify-content: center;
-  border-radius: 999px;
-  padding: 2px 6px;
-  font-size: 11px;
-  font-weight: 800;
-}
-
-.notice-tag.warning {
-  background: rgba(0, 0, 0, 0.10);
-  color: #2c3340;
-}
-
-.notice-tag.info {
-  background: rgba(0, 0, 0, 0.10);
-  color: #2c3340;
-}
-
 .chat-stage {
   flex: 1;
   min-height: 0;
@@ -804,10 +709,6 @@ button {
   grid-template-columns: minmax(0, 1fr);
 }
 
-.work-area.split {
-  grid-template-columns: minmax(0, 1fr) minmax(360px, 50%);
-}
-
 .scroll-area {
   flex: 1;
   min-height: 0;
@@ -816,46 +717,6 @@ button {
   background: #fff;
   scrollbar-width: thin;
   scrollbar-color: #b0b8c4 transparent;
-}
-
-.preview-panel {
-  min-width: 0;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  border-left: 1px solid var(--line);
-  background: #f9fafb;
-}
-
-.preview-head {
-  min-height: 42px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 0 14px;
-  border-bottom: 1px solid var(--line);
-  color: var(--navy-deep);
-  font-size: 13px;
-}
-
-.preview-head button {
-  min-height: 28px;
-  padding: 0 10px;
-  border: 1px solid var(--line-strong);
-  border-radius: 10px;
-  background: #fff;
-  color: var(--navy-deep);
-  font-size: 12px;
-  font-weight: 800;
-}
-
-.html-preview-frame {
-  flex: 1;
-  width: 100%;
-  min-height: 0;
-  border: none;
-  background: #fff;
 }
 
 .scroll-area::-webkit-scrollbar {
@@ -890,25 +751,6 @@ button {
   flex-direction: row;
   align-items: flex-start;
   gap: 10px;
-}
-
-.welcome-assistant {
-  width: 46px;
-  height: 46px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background: #fff;
-  border: 1px solid rgba(15, 32, 68, 0.16);
-  box-shadow: 0 6px 14px rgba(15, 32, 68, 0.08);
-  flex-shrink: 0;
-}
-
-.welcome-assistant img {
-  width: 52px;
-  height: 52px;
-  object-fit: contain;
 }
 
 .welcome-bubble {
@@ -1049,69 +891,6 @@ button {
 .message.user {
   flex-direction: row-reverse;
   animation-name: slideInRight;
-}
-
-.avatar {
-  width: 42px;
-  height: 42px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background: var(--navy);
-  color: #fff;
-  font-size: 13px;
-  font-weight: 800;
-  flex-shrink: 0;
-}
-
-.ai-symbol {
-  position: relative;
-  background: transparent;
-  border: none;
-  box-shadow:
-    0 0 0 2px rgba(15, 32, 68, 0.06),
-    0 0 14px rgba(15, 32, 68, 0.26);
-  overflow: visible;
-}
-
-.ai-symbol::before,
-.ai-symbol::after {
-  content: "";
-  position: absolute;
-  inset: -3px;
-  border: 1px solid rgba(15, 32, 68, 0.26);
-  border-radius: 50%;
-  pointer-events: none;
-}
-
-.ai-symbol::before {
-  box-shadow: 0 0 14px rgba(15, 32, 68, 0.32);
-  animation: aiGlow 1.9s ease-in-out infinite;
-}
-
-.ai-symbol::after {
-  inset: -5px;
-  border-color: rgba(15, 32, 68, 0.22);
-  animation: aiInnerRing 4.8s linear infinite;
-}
-
-.ai-symbol img {
-  width: 38px;
-  height: 38px;
-  object-fit: contain;
-  display: block;
-  z-index: 1;
-  animation: aiCoreMove 2.9s ease-in-out infinite;
-  transform-origin: center;
-}
-
-.council-symbol {
-  position: relative;
-  background: #fff;
-  border: 1px solid rgba(15, 32, 68, 0.18);
-  box-shadow: 0 2px 8px rgba(15, 32, 68, 0.08);
-  overflow: visible;
 }
 
 .bubble-wrap {
@@ -1433,43 +1212,6 @@ button {
   opacity: 0.55;
 }
 
-@keyframes aiGlow {
-  0% {
-    opacity: 0.68;
-    transform: scale(0.98);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.04);
-  }
-  100% {
-    opacity: 0.68;
-    transform: scale(0.98);
-  }
-}
-
-@keyframes aiInnerRing {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes aiCoreMove {
-  0%,
-  100% {
-    transform: translateY(0) rotate(0deg) scale(1);
-  }
-  35% {
-    transform: translateY(-1.5px) rotate(7deg) scale(1.04);
-  }
-  70% {
-    transform: translateY(1px) rotate(-6deg) scale(0.99);
-  }
-}
-
 @keyframes slideInLeft {
   from {
     opacity: 0;
@@ -1530,20 +1272,10 @@ button {
     min-height: 0;
   }
 
-  .work-area.split {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: minmax(360px, 1fr) 420px;
-  }
-
-  .preview-panel {
-    border-left: none;
-    border-top: 1px solid var(--line);
-  }
 }
 
 @media (max-width: 560px) {
   .chat-header,
-  .notice-stack,
   .scroll-area {
     padding-left: 16px;
     padding-right: 16px;
@@ -1795,15 +1527,6 @@ body {
   text-align: right;
 }
 
-.header-mark,
-.welcome-assistant,
-.avatar {
-  border-radius: 0;
-  border: 1px solid #315a70;
-  background: #fff8d8;
-  box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #9bb1bd;
-}
-
 .header-mark {
   border: none;
   background: transparent;
@@ -1847,8 +1570,7 @@ body {
 .admin-user button,
 .admin-btn,
 .logout-btn,
-.model-btn,
-.preview-head button {
+.model-btn {
   border-radius: 0;
   border: 1px solid #315a70;
   background: #d8e5ea;
@@ -1865,35 +1587,6 @@ body {
 .logout-btn:hover,
 .model-btn:hover {
   background: #edf7fa;
-}
-
-.notice-stack {
-  background: #b9ccd5;
-  border-top: 1px solid #f4ffff;
-  border-bottom: 1px solid #6f8fa0;
-}
-
-.notice-line {
-  min-height: 22px;
-  padding: 0 8px;
-  color: #21313a;
-  font-size: 12px;
-}
-
-.notice-line + .notice-line {
-  min-height: 21px;
-  border-top: 1px solid #8fa8b3;
-}
-
-.notice-tag {
-  min-width: auto;
-  border-radius: 0;
-  padding: 1px 5px;
-  background: #fff4a8 !important;
-  color: #102b85 !important;
-  border: 1px solid #778c96;
-  font-size: 11px;
-  font-weight: 400;
 }
 
 .chat-stage {
@@ -1931,16 +1624,6 @@ body {
 
 .welcome-row {
   gap: 7px;
-}
-
-.welcome-assistant {
-  width: 42px;
-  height: 42px;
-}
-
-.welcome-assistant img {
-  width: 45px;
-  height: 45px;
 }
 
 .welcome-bubble,
@@ -2086,28 +1769,6 @@ body {
   background: #dff1ff;
   border-color: #315a70;
   color: #17202a;
-}
-
-.council-symbol {
-  width: 36px;
-  height: 36px;
-  overflow: hidden;
-  color: #102b85;
-  font-size: 14px;
-  font-weight: 400;
-}
-
-.council-symbol::before,
-.council-symbol::after,
-.ai-symbol::before,
-.ai-symbol::after {
-  display: none;
-}
-
-.ai-symbol img {
-  width: 39px;
-  height: 39px;
-  animation: none;
 }
 
 .model-bar {
@@ -2450,7 +2111,6 @@ body.theme-retro #send-btn:hover:not(:disabled) {
   }
 
   .chat-header,
-  .notice-stack,
   .scroll-area {
     padding-left: 8px;
     padding-right: 8px;
@@ -2463,10 +2123,6 @@ body.theme-retro #send-btn:hover:not(:disabled) {
   .header-brand {
     right: 6px;
     max-width: calc(100% - 96px);
-  }
-
-  .notice-line {
-    font-size: 11px;
   }
 
   .service-menu {
@@ -3271,8 +2927,6 @@ body.theme-basic .logout-btn {
   font-size: var(--chat-main-font-size) !important;
 }
 
-.notice-line,
-.notice-tag,
 .model-btn {
   font-size: var(--chat-helper-font-size) !important;
 }
