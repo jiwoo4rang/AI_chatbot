@@ -12,6 +12,7 @@ let currentAbortController = null;
 let shouldStopResponse = false;
 let isComposingText = false;
 let submitAfterComposition = false;
+let sidebarDrag = null;
 const MODEL_LABELS = {
   ai_chatbot: '재정용어 및 예산편성에 대해 답변드립니다',
   ai_chatbot_cn: '충남도청 예산과 사업설명서에 대해 답변드립니다',
@@ -49,20 +50,38 @@ const scrollArea = document.getElementById('scroll-area');
 const conversationList = document.getElementById('conversation-list');
 const sidebar = document.querySelector('.sidebar');
 const historyToggle = document.getElementById('history-toggle');
+const historyClose = document.getElementById('history-close');
 const adminMenuBtn = document.getElementById('admin-menu-btn');
 const quickCards = document.querySelectorAll('.quick-card');
-const textStyleToggle = document.getElementById('text-style-toggle');
 const textStylePanel = document.getElementById('text-style-panel');
+const themePanel = document.getElementById('theme-panel');
+const menuFeature = document.getElementById('menu-feature');
+const menuTools = document.getElementById('menu-tools');
+const menuHistory = document.getElementById('menu-history');
+const menuTheme = document.getElementById('menu-theme');
 const inputFontSize = document.getElementById('input-font-size');
 const inputFontFamily = document.getElementById('input-font-family');
 
 sendBtn.disabled = true;
 
+function syncMobileViewportHeight() {
+  const viewport = window.visualViewport;
+  const keyboardInset = viewport
+    ? Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop)
+    : 0;
+  const isKeyboardOpen = keyboardInset > 80;
+  const composerHeight = composer?.offsetHeight || 0;
+
+  document.documentElement.style.setProperty('--keyboard-inset', `${isKeyboardOpen ? keyboardInset : 0}px`);
+  document.documentElement.style.setProperty('--composer-height', `${composerHeight}px`);
+  document.body.classList.toggle('keyboard-open', isKeyboardOpen);
+}
+
 function updateSendButton() {
   if (!sendBtn) return;
-  sendBtn.classList.toggle('stopping', isLoading);
-  sendBtn.setAttribute('aria-label', isLoading ? '답변 중지' : '전송');
-  sendBtn.disabled = userInput.disabled && !isLoading;
+  sendBtn.classList.remove('stopping');
+  sendBtn.setAttribute('aria-label', '전송');
+  sendBtn.disabled = userInput.disabled || isLoading;
 }
 
 function nowStamp() {
@@ -76,46 +95,166 @@ function nowMeta() {
 }
 
 function applyZoom() {
-  const baseSize = parseInt(inputFontSize?.value || '16', 10);
+  const baseSize = parseInt(inputFontSize?.value || '14', 10);
   const bubbleSize = zoomLevel === 3 ? baseSize + 4
     : zoomLevel === 2 ? baseSize + 2
       : baseSize;
-  const sizes = [`${bubbleSize}px`, `${Math.max(11, bubbleSize - 4)}px`, `${Math.max(11, bubbleSize - 4)}px`];
+  const mainSize = `${bubbleSize}px`;
+  const helperSize = `${Math.max(11, bubbleSize - 3)}px`;
+  const smallSize = `${Math.max(10, bubbleSize - 4)}px`;
 
-  document.querySelectorAll('.bubble').forEach(el => el.style.fontSize = sizes[0]);
-  document.querySelectorAll('.welcome-bubble').forEach(el => el.style.fontSize = sizes[0]);
-  document.querySelectorAll('.meta').forEach(el => el.style.fontSize = sizes[1]);
-  document.querySelectorAll('.timestamp').forEach(el => el.style.fontSize = sizes[2]);
+  document.documentElement.style.setProperty('--chat-main-font-size', mainSize);
+  document.documentElement.style.setProperty('--chat-helper-font-size', helperSize);
+  document.documentElement.style.setProperty('--chat-small-font-size', smallSize);
+
+  document.querySelectorAll([
+    '.bubble',
+    '.welcome-bubble',
+    '.welcome-help',
+    '.quick-card',
+    '.quick-card strong',
+    '.sys-msg',
+    '.sources',
+    '.sources a',
+    '#user-input',
+  ].join(',')).forEach(el => {
+    el.style.fontSize = mainSize;
+  });
+
+  document.querySelectorAll([
+    '.quick-card small',
+    '.quick-sub',
+    '.meta',
+    '.timestamp',
+  ].join(',')).forEach(el => {
+    el.style.fontSize = smallSize;
+  });
+
+  document.querySelectorAll([
+    '.notice-line',
+    '.notice-tag',
+    '.model-btn',
+  ].join(',')).forEach(el => {
+    el.style.fontSize = helperSize;
+  });
 }
 
 function applyInputTextStyle() {
   if (!userInput) return;
-  const fontSize = inputFontSize?.value || '16px';
+  const fontSize = inputFontSize?.value || '14px';
   const fontFamily = inputFontFamily?.value || "'RoundedFixedsys', system-ui, sans-serif";
-  userInput.style.fontSize = fontSize;
-  userInput.style.fontFamily = fontFamily;
-  if (messagesEl) messagesEl.style.fontFamily = fontFamily;
-  document.querySelectorAll('.bubble, .welcome-bubble, .sys-msg, .sources').forEach(el => {
+  document.documentElement.style.setProperty('--chat-font-family', fontFamily);
+  document.querySelectorAll([
+    '.chat-stage',
+    '#messages',
+    '.welcome-block',
+    '.welcome-bubble',
+    '.welcome-help',
+    '.service-menu',
+    '.quick-card',
+    '.quick-card strong',
+    '.quick-card small',
+    '.quick-sub',
+    '.message',
+    '.bubble-wrap',
+    '.bubble',
+    '.meta',
+    '.timestamp',
+    '.sys-msg',
+    '.sources',
+    '.model-bar',
+    '.model-btn',
+    '.composer',
+    '#user-input',
+    '#send-btn',
+  ].join(',')).forEach(el => {
     el.style.fontFamily = fontFamily;
   });
   applyZoom();
+  syncInputHeight();
   localStorage.setItem('chatInputFontSize', fontSize);
   localStorage.setItem('chatInputFontFamily', fontFamily);
 }
 
 function loadInputTextStyle() {
-  const savedSize = localStorage.getItem('chatInputFontSize');
-  const savedFamily = localStorage.getItem('chatInputFontFamily');
+  const savedSize = localStorage.getItem('chatInputFontSize') === '8px'
+    ? '10px'
+    : localStorage.getItem('chatInputFontSize');
+  const savedFamily = localStorage.getItem('chatInputFontFamily')?.includes('Yangjin')
+    ? "'RoundedFixedsys', system-ui, sans-serif"
+    : localStorage.getItem('chatInputFontFamily');
   if (savedSize && inputFontSize) inputFontSize.value = savedSize;
   if (savedFamily && inputFontFamily) inputFontFamily.value = savedFamily;
   applyInputTextStyle();
 }
 
+function positionPanelBelowButton(panel, button) {
+  if (!panel || !button) return;
+  const header = button.closest('.chat-header');
+  const headerRect = header?.getBoundingClientRect();
+  const buttonRect = button.getBoundingClientRect();
+  const panelWidth = panel.offsetWidth || 180;
+  const containerWidth = headerRect?.width || window.innerWidth;
+  const relativeLeft = headerRect ? buttonRect.left - headerRect.left : buttonRect.left;
+  const relativeTop = headerRect ? buttonRect.bottom - headerRect.top : buttonRect.bottom;
+  const maxLeft = Math.max(8, containerWidth - panelWidth - 8);
+  const left = Math.min(Math.max(relativeLeft, 8), maxLeft);
+
+  panel.style.left = `${left}px`;
+  panel.style.top = `${relativeTop}px`;
+}
+
 function setTextStylePanel(open) {
-  if (!textStylePanel || !textStyleToggle) return;
+  if (!textStylePanel) return;
+  if (open && menuTools) {
+    textStylePanel.classList.remove('hidden');
+    positionPanelBelowButton(textStylePanel, menuTools);
+  }
   textStylePanel.classList.toggle('hidden', !open);
-  textStyleToggle.classList.toggle('active', open);
-  textStyleToggle.setAttribute('aria-expanded', String(open));
+  menuTools?.classList.toggle('active', open);
+  menuTools?.setAttribute('aria-expanded', String(open));
+}
+
+function applyTheme(theme, options = {}) {
+  const validThemes = ['retro', 'basic', 'document'];
+  const nextTheme = validThemes.includes(theme) ? theme : 'retro';
+  const previousTheme = document.body.classList.contains('theme-basic') ? 'basic'
+    : document.body.classList.contains('theme-document') ? 'document'
+      : 'retro';
+  document.body.classList.toggle('theme-basic', nextTheme === 'basic');
+  document.body.classList.toggle('theme-retro', nextTheme === 'retro');
+  document.body.classList.toggle('theme-document', nextTheme === 'document');
+  themePanel?.querySelectorAll('[data-theme]').forEach(button => {
+    button.classList.toggle('active', button.dataset.theme === nextTheme);
+  });
+  localStorage.setItem('chatTheme', nextTheme);
+  if (options.resetDefaults && previousTheme !== 'basic' && nextTheme === 'basic') {
+    if (inputFontSize) inputFontSize.value = '12px';
+    if (inputFontFamily) inputFontFamily.value = 'system-ui, sans-serif';
+    applyInputTextStyle();
+  }
+}
+
+function setThemePanel(open) {
+  if (!themePanel) return;
+  if (open && menuTheme) {
+    themePanel.classList.remove('hidden');
+    positionPanelBelowButton(themePanel, menuTheme);
+  }
+  themePanel.classList.toggle('hidden', !open);
+  menuTheme?.classList.toggle('active', open);
+  menuTheme?.setAttribute('aria-expanded', String(open));
+}
+
+function loadTheme() {
+  applyTheme(localStorage.getItem('chatTheme') || 'retro');
+}
+
+function syncInputHeight() {
+  if (!userInput) return;
+  userInput.style.height = 'auto';
+  userInput.style.height = Math.min(userInput.scrollHeight, 148) + 'px';
+  syncMobileViewportHeight();
 }
 
 function zoomText() {
@@ -316,14 +455,63 @@ function openConversation(id) {
 }
 
 function setHistoryPanel(open) {
-  if (!sidebar || !historyToggle) return;
+  if (!sidebar) return;
+  if (open && window.matchMedia('(max-width: 900px)').matches) {
+    sidebar.style.left = '';
+    sidebar.style.top = '';
+  }
   sidebar.classList.toggle('open', open);
-  historyToggle.setAttribute('aria-expanded', String(open));
-  historyToggle.setAttribute('aria-label', open ? '채팅 기록 닫기' : '채팅 기록 열기');
+  document.body.classList.toggle('history-open', open);
+  menuHistory?.classList.toggle('active', open);
+  menuHistory?.setAttribute('aria-expanded', String(open));
 }
 
 function closeHistoryPanel() {
   setHistoryPanel(false);
+}
+
+function clampSidebarPosition(left, top) {
+  if (!sidebar) return { left, top };
+  const rect = sidebar.getBoundingClientRect();
+  const maxLeft = Math.max(0, window.innerWidth - rect.width);
+  const maxTop = Math.max(0, window.innerHeight - rect.height);
+  return {
+    left: Math.min(Math.max(0, left), maxLeft),
+    top: Math.min(Math.max(0, top), maxTop),
+  };
+}
+
+function startSidebarDrag(event) {
+  if (!sidebar || event.button !== 0) return;
+  if (event.target.closest('button')) return;
+
+  const rect = sidebar.getBoundingClientRect();
+  const isTitleBar = event.clientY - rect.top <= 24;
+  if (!isTitleBar) return;
+
+  sidebarDrag = {
+    pointerId: event.pointerId,
+    offsetX: event.clientX - rect.left,
+    offsetY: event.clientY - rect.top,
+  };
+  sidebar.setPointerCapture(event.pointerId);
+  event.preventDefault();
+}
+
+function moveSidebarDrag(event) {
+  if (!sidebar || !sidebarDrag || event.pointerId !== sidebarDrag.pointerId) return;
+  const next = clampSidebarPosition(
+    event.clientX - sidebarDrag.offsetX,
+    event.clientY - sidebarDrag.offsetY
+  );
+  sidebar.style.left = `${next.left}px`;
+  sidebar.style.top = `${next.top}px`;
+}
+
+function endSidebarDrag(event) {
+  if (!sidebar || !sidebarDrag || event.pointerId !== sidebarDrag.pointerId) return;
+  sidebar.releasePointerCapture(event.pointerId);
+  sidebarDrag = null;
 }
 
 function fmt(text) {
@@ -490,7 +678,16 @@ function showTyping() {
 
   const bubble = document.createElement('div');
   bubble.className = 'bubble';
-  bubble.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
+  bubble.innerHTML = `
+    <div class="typing-loader" role="status" aria-label="답변 생성 준비 중">
+      <div class="typing-loader-head">
+        <span>LOADING...</span>
+      </div>
+      <div class="typing-loader-track">
+        ${Array.from({ length: 10 }, () => '<span></span>').join('')}
+      </div>
+    </div>
+  `;
 
   bubbleWrap.appendChild(meta);
   bubbleWrap.appendChild(bubble);
@@ -711,8 +908,9 @@ async function sendMessage() {
     return;
   }
 
-  const text = userInput.value.trim();
-  if (!text) return;
+  const typedText = userInput.value.trim();
+  if (!typedText) return;
+  const text = typedText;
 
   if (!selectedModel) {
     addSys('모델 연결을 확인한 뒤 다시 질문해 주세요.');
@@ -844,15 +1042,66 @@ if (historyToggle) {
   });
 }
 
-if (textStyleToggle) {
-  textStyleToggle.addEventListener('click', event => {
-    event.stopPropagation();
-    setTextStylePanel(textStylePanel?.classList.contains('hidden'));
+if (menuHistory) {
+  menuHistory.setAttribute('aria-expanded', 'false');
+  menuHistory.addEventListener('click', () => {
+    setTextStylePanel(false);
+    setThemePanel(false);
+    setHistoryPanel(!sidebar?.classList.contains('open'));
   });
+}
+
+if (historyClose) {
+  historyClose.addEventListener('click', event => {
+    event.stopPropagation();
+    closeHistoryPanel();
+  });
+}
+
+if (sidebar) {
+  sidebar.addEventListener('pointerdown', startSidebarDrag);
+  sidebar.addEventListener('pointermove', moveSidebarDrag);
+  sidebar.addEventListener('pointerup', endSidebarDrag);
+  sidebar.addEventListener('pointercancel', endSidebarDrag);
 }
 
 if (textStylePanel) {
   textStylePanel.addEventListener('click', event => event.stopPropagation());
+}
+
+if (themePanel) {
+  themePanel.addEventListener('click', event => event.stopPropagation());
+  themePanel.querySelectorAll('[data-theme]').forEach(button => {
+    button.addEventListener('click', () => {
+      applyTheme(button.dataset.theme, { resetDefaults: true });
+      setThemePanel(false);
+    });
+  });
+}
+
+if (menuFeature) {
+  menuFeature.addEventListener('click', () => {
+    if (isLoading) return;
+    clearChat();
+  });
+}
+
+if (menuTools) {
+  menuTools.setAttribute('aria-expanded', 'false');
+  menuTools.addEventListener('click', event => {
+    event.stopPropagation();
+    setThemePanel(false);
+    setTextStylePanel(textStylePanel?.classList.contains('hidden'));
+  });
+}
+
+if (menuTheme) {
+  menuTheme.setAttribute('aria-expanded', 'false');
+  menuTheme.addEventListener('click', event => {
+    event.stopPropagation();
+    setTextStylePanel(false);
+    setThemePanel(themePanel?.classList.contains('hidden'));
+  });
 }
 
 if (inputFontSize) inputFontSize.addEventListener('change', applyInputTextStyle);
@@ -862,27 +1111,46 @@ quickCards.forEach(card => {
   card.addEventListener('click', () => selectModel(card.dataset.model));
 });
 
-if (sidebar) {
-  sidebar.addEventListener('mouseleave', closeHistoryPanel);
-}
-
 document.addEventListener('keydown', event => {
-  if (event.key === 'Escape') closeHistoryPanel();
+  if (event.key === 'Escape') {
+    closeHistoryPanel();
+    setTextStylePanel(false);
+    setThemePanel(false);
+  }
 });
 
 document.addEventListener('click', event => {
   if (event.target.closest('.conversation-menu')) return;
-  if (!event.target.closest('.text-style-panel') && !event.target.closest('#text-style-toggle')) {
+  if (!event.target.closest('.text-style-panel') && !event.target.closest('#menu-tools')) {
     setTextStylePanel(false);
+  }
+  if (!event.target.closest('.theme-panel') && !event.target.closest('#menu-theme')) {
+    setThemePanel(false);
   }
   document.querySelectorAll('.conversation-menu.open').forEach(menu => menu.classList.remove('open'));
 });
 
+loadTheme();
 loadInputTextStyle();
+syncMobileViewportHeight();
+
+window.addEventListener('resize', syncMobileViewportHeight);
+window.addEventListener('orientationchange', () => {
+  setTimeout(syncMobileViewportHeight, 250);
+});
+
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', syncMobileViewportHeight);
+  window.visualViewport.addEventListener('scroll', syncMobileViewportHeight);
+}
 
 userInput.addEventListener('input', () => {
-  userInput.style.height = 'auto';
-  userInput.style.height = Math.min(userInput.scrollHeight, 148) + 'px';
+  syncInputHeight();
+});
+
+userInput.addEventListener('focus', () => {
+  syncMobileViewportHeight();
+  setTimeout(scrollToBottom, 120);
 });
 
 userInput.addEventListener('compositionstart', () => {
@@ -910,7 +1178,6 @@ userInput.addEventListener('keydown', e => {
 sendBtn.addEventListener('click', e => {
   if (!isLoading) return;
   e.preventDefault();
-  stopResponse();
 });
 
 composer.addEventListener('submit', e => {

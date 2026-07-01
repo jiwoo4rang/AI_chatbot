@@ -36,7 +36,13 @@
   </section>
 
   <div class="app">
+    <div class="window-controls" aria-hidden="true">
+      <span class="window-control close"></span>
+    </div>
     <aside class="sidebar" aria-label="이전 대화 목록">
+      <div class="window-controls sidebar-controls">
+        <button class="window-control close" id="history-close" type="button" aria-label="채팅 기록 닫기"></button>
+      </div>
       <div class="conversation-panel">
         <div class="conversation-title">채팅 기록</div>
         <div class="conversation-list" id="conversation-list"></div>
@@ -50,6 +56,41 @@
 
     <main class="main-panel">
       <header class="chat-header">
+        <nav class="chat-menu-bar" aria-label="상단 메뉴">
+          <button type="button" id="menu-feature">새 대화(A)</button>
+          <button type="button" id="menu-tools">글자 설정(T)</button>
+          <button type="button" id="menu-history">채팅 기록(C)</button>
+          <button type="button" id="menu-theme">테마(S)</button>
+        </nav>
+        <div class="text-style-panel hidden" id="text-style-panel" aria-label="글자 설정">
+          <label>
+            <span>글자 크기</span>
+            <select id="input-font-size">
+              <option value="10px">10</option>
+              <option value="12px">12</option>
+              <option value="14px" selected>14</option>
+              <option value="16px">16</option>
+              <option value="18px">18</option>
+              <option value="20px">20</option>
+            </select>
+          </label>
+          <label>
+            <span>폰트</span>
+            <select id="input-font-family">
+              <option value="'RoundedFixedsys', system-ui, sans-serif">둥근고정</option>
+              <option value="'JoseonGulim', system-ui, sans-serif">조선굴림</option>
+              <option value="'Nanum Myeongjo', serif">나눔명조</option>
+              <option value="'OngleipKonkon', system-ui, sans-serif">온글잎 콘콘</option>
+              <option value="'NexonLv1Gothic', system-ui, sans-serif">넥슨 Lv1 고딕</option>
+              <option value="system-ui, sans-serif">기본체</option>
+            </select>
+          </label>
+        </div>
+        <div class="theme-panel hidden" id="theme-panel" aria-label="테마 설정">
+          <button type="button" data-theme="retro">레트로</button>
+          <button type="button" data-theme="basic">기본테마</button>
+          <button type="button" data-theme="document">의회 문서</button>
+        </div>
         <div class="header-left">
           <div class="header-brand">
             <img src="favicon.png" class="header-mark" alt="">
@@ -65,13 +106,6 @@
             <span></span>
             <span></span>
             <span></span>
-          </button>
-          <button class="new-chat-btn" type="button" onclick="clearChat()" aria-label="새 채팅">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
-              <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
-            </svg>
-            <span>새 대화</span>
           </button>
         </div>
       </header>
@@ -93,7 +127,7 @@
                   <button class="quick-card" type="button" data-model="ai_chatbot">
                     <span class="quick-icon"><img src="icon-finance.svg" alt=""></span>
                     <span>
-                      <strong>재정용어·관련 법령</strong>
+                      <strong>재정용어<br>관련 법령</strong>
                       <small class="quick-sub">&nbsp;</small>
                     </span>
                   </button>
@@ -117,51 +151,12 @@
           </div>
         </div>
 
-        <aside class="buddy-panel" aria-label="대화 상대 정보">
-          <div class="buddy-card buddy-primary">
-            <img src="충랑이.png" alt="">
-            <strong>충랑이</strong>
-          </div>
-          <div class="buddy-card">
-            <img src="favicon.png" alt="">
-            <strong>충청남도의회</strong>
-          </div>
-          <div class="buddy-card buddy-bottom">
-            <img src="백룡이.png" alt="">
-            <strong>백룡이</strong>
-          </div>
-        </aside>
-
         <div class="model-bar" id="model-bar" aria-label="모델 선택"></div>
         <form class="composer" id="composer">
-          <div class="composer-tools" aria-label="입력 도구">
-            <button class="composer-tool" id="text-style-toggle" type="button" aria-label="글자 설정" aria-expanded="false">T</button>
-            <button class="composer-tool" type="button" aria-label="이모티콘">🙂</button>
-            <button class="composer-tool" type="button" aria-label="붙여넣기">📋</button>
+          <div class="composer-input-row">
+            <textarea id="user-input" rows="1" placeholder="잠시만 기다려주세요." disabled></textarea>
+            <button id="send-btn" type="submit" aria-label="전송">보내기</button>
           </div>
-          <div class="text-style-panel hidden" id="text-style-panel" aria-label="글자 설정">
-            <label>
-              <span>크기</span>
-              <select id="input-font-size">
-                <option value="8px">8</option>
-                <option value="10px">10</option>
-                <option value="14px">14</option>
-                <option value="16px" selected>16</option>
-                <option value="18px">18</option>
-                <option value="20px">20</option>
-              </select>
-            </label>
-            <label>
-              <span>폰트</span>
-              <select id="input-font-family">
-                <option value="'RoundedFixedsys', system-ui, sans-serif">둥근고정</option>
-                <option value="'Yangjin', 'RoundedFixedsys', system-ui, sans-serif">양진체</option>
-                <option value="system-ui, sans-serif">기본체</option>
-              </select>
-            </label>
-          </div>
-          <textarea id="user-input" rows="1" placeholder="잠시만 기다려주세요. 연결중입니다." disabled></textarea>
-          <button id="send-btn" type="submit" aria-label="전송">보내기</button>
         </form>
       </section>
     </main>
