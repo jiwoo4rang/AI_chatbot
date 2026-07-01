@@ -73,11 +73,7 @@ pip install chromadb FlagEmbedding
 
 ## 🔑 관리자 계정
 
-<<<<<<< HEAD
-운영 환경에서는 반드시 환경 변수로 변경해서 실행하세요.
-=======
 최초 실행 시 관리자 계정이 자동 생성됩니다. 운영 환경에서는 기본값을 쓰지 말고 환경 변수로 변경하세요.
->>>>>>> ce04b3d (Remove hardcoded secrets from config)
 
 ```bash
 ADMIN_USERNAME=admin_user ADMIN_PASSWORD=strong_password LLM_API_KEY=your_api_key python3 rag_server.py
