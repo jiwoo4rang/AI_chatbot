@@ -8,43 +8,43 @@
 
 기본 로그인 화면은 테마 설정과 무관하게 고정된 기본 스타일로 표시됩니다.
 
-![로그인 화면](screenshot/login_screen.jpeg)
+<img src="screenshot/login_screen.jpeg" alt="로그인 화면" width="360">
 
 ### 메인 화면
 
 질문 분야를 먼저 선택한 뒤 하단 입력창에서 질문을 전송합니다.
 
-![메인 화면](screenshot/main_screen.jpeg)
+<img src="screenshot/main_screen.jpeg" alt="메인 화면" width="360">
 
 ### AI 답변
 
 사용자 질문과 AI 답변을 채팅 형태로 보여주며, 답변에는 핵심 답변과 관련 근거를 함께 표시합니다.
 
-![AI 답변 화면](screenshot/ai_answer_screen.jpeg)
+<img src="screenshot/ai_answer_screen.jpeg" alt="AI 답변 화면" width="360">
 
 ### 글자 설정
 
 상단 메뉴에서 글자 크기와 폰트를 조정할 수 있습니다.
 
-![글자 설정 화면](screenshot/font_style.jpeg)
+<img src="screenshot/font_style.jpeg" alt="글자 설정 화면" width="360">
 
 ### 채팅 기록
 
 이전 대화는 채팅 기록 패널에서 다시 열람할 수 있으며, 로그인 사용자별로 관리됩니다.
 
-![채팅 기록 화면](screenshot/chat_record.jpeg)
+<img src="screenshot/chat_record.jpeg" alt="채팅 기록 화면" width="360">
 
 ### 기본테마
 
 업무용 환경에 맞춘 간결한 기본테마를 제공합니다.
 
-![기본테마 화면](screenshot/basic_screen.jpeg)
+<img src="screenshot/basic_screen.jpeg" alt="기본테마 화면" width="360">
 
 ### 의회테마
 
 문서 검토 화면에 어울리는 의회테마를 제공합니다.
 
-![의회테마 화면](screenshot/business_style.jpeg)
+<img src="screenshot/business_style.jpeg" alt="의회테마 화면" width="360">
 
 ## 주요 기능
 
