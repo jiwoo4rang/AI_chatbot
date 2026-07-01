@@ -449,7 +449,6 @@ function openConversation(id) {
   }
 
   renderConversationList();
-  closeHistoryPanel();
   scrollToBottom();
   applyZoom();
 }

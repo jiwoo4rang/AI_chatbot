@@ -41,7 +41,7 @@ chatbot/
 
 ```bash
 cd /home/ahye/services/chatbot
-LLM_API_KEY=your_api_key SECRET_KEY=change_this_secret python3 rag_server.py
+LLM_API_KEY=<LLM_API_KEY> SECRET_KEY=<세션_시크릿> python3 rag_server.py
 ```
 
 기본 접속 주소:
@@ -53,7 +53,7 @@ http://localhost:3000
 포트를 바꿔 실행하려면:
 
 ```bash
-PORT=8080 LLM_API_KEY=your_api_key SECRET_KEY=change_this_secret python3 rag_server.py
+PORT=8080 LLM_API_KEY=<LLM_API_KEY> SECRET_KEY=<세션_시크릿> python3 rag_server.py
 ```
 
 ## 📦 필요 패키지
@@ -76,7 +76,7 @@ pip install chromadb FlagEmbedding
 최초 실행 시 관리자 계정이 자동 생성됩니다. 운영 환경에서는 기본값을 쓰지 말고 환경 변수로 변경하세요.
 
 ```bash
-ADMIN_USERNAME=admin_user ADMIN_PASSWORD=strong_password LLM_API_KEY=your_api_key python3 rag_server.py
+ADMIN_USERNAME=<관리자_아이디> ADMIN_PASSWORD=<관리자_비밀번호> LLM_API_KEY=<LLM_API_KEY> python3 rag_server.py
 ```
 
 ## ⚙️ 환경 변수
