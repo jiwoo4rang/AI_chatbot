@@ -8,6 +8,7 @@ let zoomLevel = 1;
 let currentConversationId = null;
 let conversations = [];
 let currentUser = null;
+let adminUserList = [];
 let currentAbortController = null;
 let shouldStopResponse = false;
 let isComposingText = false;
@@ -25,11 +26,16 @@ const loginForm = document.getElementById('login-form');
 const loginUsername = document.getElementById('login-username');
 const loginPassword = document.getElementById('login-password');
 const loginError = document.getElementById('login-error');
+const rememberLogin = document.getElementById('remember-login');
+const rememberId = document.getElementById('remember-id');
 const userChip = document.getElementById('user-chip');
 const logoutBtn = document.getElementById('logout-btn');
 const adminOpen = document.getElementById('admin-open');
 const adminModal = document.getElementById('admin-modal');
 const adminClose = document.getElementById('admin-close');
+const adminCreateToggle = document.getElementById('admin-create-toggle');
+const adminUserSearch = document.getElementById('admin-user-search');
+const adminUserCount = document.getElementById('admin-user-count');
 const adminUsers = document.getElementById('admin-users');
 const userCreateForm = document.getElementById('user-create-form');
 const newUsername = document.getElementById('new-username');
@@ -61,17 +67,22 @@ const menuHistory = document.getElementById('menu-history');
 const menuTheme = document.getElementById('menu-theme');
 const inputFontSize = document.getElementById('input-font-size');
 const inputFontFamily = document.getElementById('input-font-family');
+const SAVED_LOGIN_ID_KEY = 'chatSavedLoginId';
+const REMEMBER_LOGIN_KEY = 'chatRememberLogin';
+const REMEMBER_ID_KEY = 'chatRememberId';
 
 sendBtn.disabled = true;
 
 function syncMobileViewportHeight() {
   const viewport = window.visualViewport;
+  const viewportHeight = viewport?.height || window.innerHeight;
   const keyboardInset = viewport
     ? Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop)
     : 0;
   const isKeyboardOpen = keyboardInset > 80;
   const composerHeight = composer?.offsetHeight || 0;
 
+  document.documentElement.style.setProperty('--app-viewport-height', `${viewportHeight}px`);
   document.documentElement.style.setProperty('--keyboard-inset', `${isKeyboardOpen ? keyboardInset : 0}px`);
   document.documentElement.style.setProperty('--composer-height', `${composerHeight}px`);
   document.body.classList.toggle('keyboard-open', isKeyboardOpen);
@@ -186,6 +197,32 @@ function loadInputTextStyle() {
   if (savedSize && inputFontSize) inputFontSize.value = savedSize;
   if (savedFamily && inputFontFamily) inputFontFamily.value = savedFamily;
   applyInputTextStyle();
+}
+
+function loadLoginOptions() {
+  const savedId = localStorage.getItem(SAVED_LOGIN_ID_KEY) || '';
+  const shouldRememberId = localStorage.getItem(REMEMBER_ID_KEY) === 'true';
+  const shouldRememberLogin = localStorage.getItem(REMEMBER_LOGIN_KEY) === 'true';
+
+  if (rememberId) rememberId.checked = shouldRememberId;
+  if (rememberLogin) rememberLogin.checked = shouldRememberLogin;
+  if (shouldRememberId && loginUsername) {
+    loginUsername.value = savedId;
+  }
+}
+
+function saveLoginOptions(username) {
+  const shouldRememberId = Boolean(rememberId?.checked);
+  const shouldRememberLogin = Boolean(rememberLogin?.checked);
+
+  localStorage.setItem(REMEMBER_ID_KEY, String(shouldRememberId));
+  localStorage.setItem(REMEMBER_LOGIN_KEY, String(shouldRememberLogin));
+
+  if (shouldRememberId) {
+    localStorage.setItem(SAVED_LOGIN_ID_KEY, username);
+  } else {
+    localStorage.removeItem(SAVED_LOGIN_ID_KEY);
+  }
 }
 
 function positionPanelBelowButton(panel, button) {
@@ -467,6 +504,27 @@ function setHistoryPanel(open) {
 
 function closeHistoryPanel() {
   setHistoryPanel(false);
+}
+
+function isMobileViewport() {
+  return window.matchMedia('(max-width: 900px)').matches;
+}
+
+function wait(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function settleMobileLoginViewport() {
+  if (!isMobileViewport()) return;
+  document
+    .querySelector('meta[name="viewport"]')
+    ?.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover');
+  document.activeElement?.blur?.();
+  syncMobileViewportHeight();
+  window.scrollTo(0, 0);
+  await wait(180);
+  syncMobileViewportHeight();
+  window.scrollTo(0, 0);
 }
 
 function clampSidebarPosition(left, top) {
@@ -757,7 +815,9 @@ function selectModel(key, resetChat = true) {
   document.querySelectorAll('.quick-card').forEach(item => {
     item.classList.toggle('active', item.dataset.model === key);
   });
-  userInput.focus();
+  if (!isMobileViewport()) {
+    userInput.focus();
+  }
 }
 
 function syncQuickCards(models) {
@@ -775,6 +835,15 @@ function applyUser(user) {
   if (userChip) userChip.textContent = user ? `${user.display_name}님 계정` : '';
   if (adminOpen) adminOpen.classList.toggle('hidden', user?.role !== 'admin');
   if (adminMenuBtn) adminMenuBtn.classList.toggle('hidden', user?.role !== 'admin');
+  closeHistoryPanel();
+  if (user && isMobileViewport()) {
+    document.activeElement?.blur?.();
+    window.scrollTo(0, 0);
+    setTimeout(() => {
+      syncMobileViewportHeight();
+      window.scrollTo(0, 0);
+    }, 120);
+  }
 }
 
 function renderModelButtons(models) {
@@ -815,15 +884,19 @@ async function checkSession() {
 async function handleLogin(event) {
   event.preventDefault();
   if (loginError) loginError.textContent = '';
+  const username = loginUsername.value.trim();
   try {
     const data = await apiFetch('/api/login', {
       method: 'POST',
       body: JSON.stringify({
-        username: loginUsername.value.trim(),
-        password: loginPassword.value
+        username,
+        password: loginPassword.value,
+        remember: Boolean(rememberLogin?.checked)
       })
     });
+    saveLoginOptions(username);
     loginPassword.value = '';
+    await settleMobileLoginViewport();
     applyUser(data.user);
     await loadConversationStore();
     renderConversationList();
@@ -849,16 +922,48 @@ async function handleLogout() {
 
 async function loadAdminUsers() {
   const data = await apiFetch('/api/admin/users');
+  adminUserList = data.users || [];
+  renderAdminUsers();
+}
+
+function renderAdminUsers() {
+  const query = (adminUserSearch?.value || '').trim().toLowerCase();
+  const filteredUsers = adminUserList.filter(user => {
+    const roleLabel = user.role === 'admin' ? '관리자' : '일반 사용자';
+    return [
+      user.display_name,
+      user.username,
+      roleLabel,
+    ].some(value => String(value || '').toLowerCase().includes(query));
+  });
+
   adminUsers.innerHTML = '';
-  (data.users || []).forEach(user => {
+  if (adminUserCount) {
+    adminUserCount.textContent = query
+      ? `사용자 ${filteredUsers.length}명 / 전체 ${adminUserList.length}명`
+      : `사용자 ${adminUserList.length}명`;
+  }
+
+  if (!filteredUsers.length) {
+    const empty = document.createElement('div');
+    empty.className = 'admin-empty';
+    empty.textContent = query ? '검색 결과가 없습니다.' : '등록된 사용자가 없습니다.';
+    adminUsers.appendChild(empty);
+    return;
+  }
+
+  filteredUsers.forEach(user => {
     const row = document.createElement('div');
     row.className = 'admin-user';
     row.innerHTML = `
-      <div><strong>${fmt(user.display_name)}</strong><br><span>${fmt(user.username)}</span></div>
-      <span>${user.role === 'admin' ? '관리자' : '일반 사용자'}</span>
-      <span>${user.is_active ? '사용 중' : '중지'}</span>
-      <button type="button" data-action="toggle">${user.is_active ? '중지' : '복구'}</button>
-      <button type="button" class="danger" data-action="delete">삭제</button>
+      <div class="admin-user-main"><strong>${fmt(user.display_name)}</strong><br><span>${fmt(user.username)}</span></div>
+      <div class="admin-user-meta">
+        <span class="admin-user-role" data-label="권한">${user.role === 'admin' ? '관리자' : '일반 사용자'}</span>
+      </div>
+      <div class="admin-user-actions">
+        <button type="button" data-action="toggle">${user.is_active ? '중지' : '복구'}</button>
+        <button type="button" class="danger" data-action="delete">삭제</button>
+      </div>
     `;
     row.querySelector('[data-action="toggle"]').addEventListener('click', async () => {
       await apiFetch(`/api/admin/users/${user.id}`, {
@@ -873,6 +978,27 @@ async function loadAdminUsers() {
     });
     adminUsers.appendChild(row);
   });
+}
+
+function setAdminCreateForm(open) {
+  if (!userCreateForm) return;
+  userCreateForm.classList.toggle('hidden', !open);
+  adminCreateToggle?.classList.toggle('active', open);
+  adminCreateToggle?.setAttribute('aria-expanded', String(open));
+  if (!open) userCreateForm.reset();
+  if (open) newUsername?.focus();
+}
+
+async function openAdminModal() {
+  adminModal.classList.remove('hidden');
+  if (adminUserSearch) adminUserSearch.value = '';
+  setAdminCreateForm(false);
+  await loadAdminUsers();
+}
+
+function closeAdminModal() {
+  setAdminCreateForm(false);
+  adminModal.classList.add('hidden');
 }
 
 async function loadModels() {
@@ -982,7 +1108,9 @@ async function sendMessage() {
     currentAbortController = null;
     shouldStopResponse = false;
     updateSendButton();
-    userInput.focus();
+    if (!isMobileViewport()) {
+      userInput.focus();
+    }
   }
 }
 
@@ -997,21 +1125,25 @@ if (logoutBtn) {
 }
 
 if (adminOpen) {
-  adminOpen.addEventListener('click', async () => {
-    adminModal.classList.remove('hidden');
-    await loadAdminUsers();
-  });
+  adminOpen.addEventListener('click', openAdminModal);
 }
 
 if (adminMenuBtn) {
-  adminMenuBtn.addEventListener('click', async () => {
-    adminModal.classList.remove('hidden');
-    await loadAdminUsers();
-  });
+  adminMenuBtn.addEventListener('click', openAdminModal);
 }
 
 if (adminClose) {
-  adminClose.addEventListener('click', () => adminModal.classList.add('hidden'));
+  adminClose.addEventListener('click', closeAdminModal);
+}
+
+if (adminCreateToggle) {
+  adminCreateToggle.addEventListener('click', () => {
+    setAdminCreateForm(userCreateForm?.classList.contains('hidden'));
+  });
+}
+
+if (adminUserSearch) {
+  adminUserSearch.addEventListener('input', renderAdminUsers);
 }
 
 if (previewClose) {
@@ -1031,6 +1163,7 @@ if (userCreateForm) {
       })
     });
     userCreateForm.reset();
+    setAdminCreateForm(false);
     await loadAdminUsers();
   });
 }
@@ -1131,6 +1264,7 @@ document.addEventListener('click', event => {
 
 loadTheme();
 loadInputTextStyle();
+loadLoginOptions();
 syncMobileViewportHeight();
 
 window.addEventListener('resize', syncMobileViewportHeight);

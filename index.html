@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#f5dcc0">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="AI의정브레인">
@@ -30,6 +30,16 @@
         <span>비밀번호</span>
         <input id="login-password" type="password" placeholder="비밀번호" autocomplete="current-password" required>
       </label>
+      <div class="login-options">
+        <label>
+          <input id="remember-login" type="checkbox">
+          <span>자동로그인</span>
+        </label>
+        <label>
+          <input id="remember-id" type="checkbox">
+          <span>아이디 기억</span>
+        </label>
+      </div>
       <button type="submit">로그인</button>
       <div class="login-error" id="login-error"></div>
     </form>
@@ -166,9 +176,12 @@
     <div class="admin-panel">
       <div class="admin-head">
         <h2>사용자 관리</h2>
-        <button id="admin-close" type="button">닫기</button>
+        <div class="admin-head-actions">
+          <button id="admin-create-toggle" type="button" aria-expanded="false">계정 추가</button>
+          <button id="admin-close" type="button">닫기</button>
+        </div>
       </div>
-      <form class="admin-create" id="user-create-form">
+      <form class="admin-create hidden" id="user-create-form">
         <input id="new-username" type="text" placeholder="아이디" required>
         <input id="new-display-name" type="text" placeholder="표시 이름" required>
         <input id="new-password" type="password" placeholder="초기 비밀번호" required>
@@ -178,6 +191,10 @@
         </select>
         <button type="submit">계정 추가</button>
       </form>
+      <div class="admin-toolbar">
+        <input id="admin-user-search" type="search" placeholder="사용자 검색" autocomplete="off">
+        <span id="admin-user-count">사용자 0명</span>
+      </div>
       <div class="admin-users" id="admin-users"></div>
     </div>
   </section>

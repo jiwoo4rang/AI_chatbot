@@ -4,6 +4,7 @@
 
 import os
 import uuid
+from datetime import timedelta
 from functools import wraps
 
 import requests
@@ -31,6 +32,7 @@ from llm_gateway import LLM_BASE_URL, LLM_MODEL, build_messages, call_llm, list_
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "assembly-ai-change-this-secret")
+app.permanent_session_lifetime = timedelta(days=int(os.getenv("AUTO_LOGIN_DAYS", "30")))
 CORS(app)
 init_db()
 
@@ -153,6 +155,7 @@ def login():
     data = request.json or {}
     username = (data.get("username") or "").strip()
     password = data.get("password") or ""
+    remember = bool(data.get("remember"))
     try:
         user = verify_user(username, password)
     except Exception as e:
@@ -161,6 +164,7 @@ def login():
     if not user:
         return jsonify({"error": "아이디 또는 비밀번호를 확인해 주세요."}), 401
 
+    session.permanent = remember
     session["user_id"] = user["id"]
     return jsonify({"user": user})
 
